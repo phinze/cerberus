@@ -1,5 +1,4 @@
 require 'rubygems'
-require 'IRC'
 require 'cerberus/publisher/base'
 require 'cerberus/vendor/shout-bot'
 
@@ -8,7 +7,7 @@ class Cerberus::Publisher::IRC < Cerberus::Publisher::Base
     irc_options = options[:publisher, :irc]
     raise "There is no channel provided for IRC publisher" unless irc_options[:channel]
     subject,body = Cerberus::Publisher::Base.formatted_message(state, manager, options)
-    message = subject + "\n" + '*' * subject.length + "\n" + body
+    message = subject + "\n" + '*' * subject.length
 
     nick = irc_options[:nick] || 'CerberusBot'
     port = irc_options[:port] || 6667
