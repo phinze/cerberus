@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'IRC'
 require 'cerberus/publisher/base'
+require 'cerberus/vendor/shout-bot'
 
 class Cerberus::Publisher::IRC < Cerberus::Publisher::Base
   def self.publish(state, manager, options)
@@ -9,19 +10,16 @@ class Cerberus::Publisher::IRC < Cerberus::Publisher::Base
     subject,body = Cerberus::Publisher::Base.formatted_message(state, manager, options)
     message = subject + "\n" + '*' * subject.length + "\n" + body
 
-    channel = '#' + irc_options[:channel]
-    bot = IRC.new(irc_options[:nick] || 'cerberus', irc_options[:server], irc_options[:port] || 6667)
+    nick = irc_options[:nick] || 'CerberusBot'
+    port = irc_options[:port] || 6667
+    uri = "irc://#{irc_options[:server]}:#{port}/#{irc_options[:channel]}"
 
     silence_stream(STDOUT) do
-      IRCEvent.add_callback('endofmotd') do |event| 
-        bot.add_channel(channel) 
-        message.split("\n").each do |line|
-          bot.send_message(channel, line)
-        end
-        bot.send_quit
+      ShoutBot.shout( uri, :as => nick ) do |channel|
+        message.split("\n").each { |line| channel.say( line ) }
       end
-      bot.connect
     end
 
   end
 end
+# http://github.com/sr/integrity-irc/blob/2ab5c3b4e865614204d2af41daf4c4bf2c20b3ab/lib/notifier/irc.rb
