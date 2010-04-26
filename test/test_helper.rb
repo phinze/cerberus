@@ -25,6 +25,9 @@ class Test::Unit::TestCase
   HG_REPO = TEMP_DIR + '/hg_repo'
   HG_URL  = 'file:///' + HG_REPO.gsub(/\\/, '/').gsub(/^\//, '').gsub(' ', '%20')
 
+  BZR_REPO = TEMP_DIR + '/bzr_repo'
+  BZR_URL  = 'file:///' + BZR_REPO.gsub(/\\/, '/').gsub(/^\//, '').gsub(' ', '%20')
+
   def self.refresh_repos
     # setup base subversion repos
     FileUtils.rm_rf TEMP_DIR
@@ -59,6 +62,16 @@ class Test::Unit::TestCase
     Zip::ZipFile::open("#{File.dirname(__FILE__)}/data/mercurial.zip") { |zf|
       zf.each { |e|
         fpath = File.join(HG_REPO, e.name)
+        FileUtils.mkdir_p(File.dirname(fpath))
+        zf.extract(e, fpath)
+      }
+    }
+    
+    # setup base bzr repos
+    FileUtils.mkpath BZR_REPO
+    Zip::ZipFile::open("#{File.dirname(__FILE__)}/data/bazaar.zip") { |zf|
+      zf.each { |e|
+        fpath = File.join(BZR_REPO, e.name)
         FileUtils.mkdir_p(File.dirname(fpath))
         zf.extract(e, fpath)
       }
